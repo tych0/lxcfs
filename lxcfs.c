@@ -578,6 +578,7 @@ static int cg_getattr(const char *path, struct stat *sb)
 	if (is_child_cgroup(controller, path1, path2)) {
 		if (!caller_may_see_dir(fc->pid, controller, cgroup)) {
 			ret = -ENOENT;
+			fprintf(stderr, "caller cannot see dir %s (%d %s %s)\n", path, fc->pid, controller, cgroup);
 			goto out;
 		}
 		if (!caller_is_in_ancestor(fc->pid, controller, cgroup, NULL)) {
@@ -617,6 +618,7 @@ static int cg_getattr(const char *path, struct stat *sb)
 		free_key(k);
 		if (!caller_is_in_ancestor(fc->pid, controller, path1, NULL)) {
 			ret = -ENOENT;
+			fprintf(stderr, "caller cannot in ancestor %s (%d %s %s)\n", path, fc->pid, controller, path1);
 			goto out;
 		}
 		if (!fc_may_access(fc, controller, path1, path2, O_RDONLY)) {
@@ -629,6 +631,7 @@ static int cg_getattr(const char *path, struct stat *sb)
 
 out:
 	free(cgdir);
+	fprintf(stderr, "getattr for %s: %d\n", path, ret);
 	return ret;
 }
 
@@ -2907,6 +2910,7 @@ static int proc_read(const char *path, char *buf, size_t size, off_t offset,
 
 static int lxcfs_getattr(const char *path, struct stat *sb)
 {
+	fprintf(stderr, "getting attr for %s\n", path);
 	if (strcmp(path, "/") == 0) {
 		sb->st_mode = S_IFDIR | 00755;
 		sb->st_nlink = 2;
