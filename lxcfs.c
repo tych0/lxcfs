@@ -448,6 +448,8 @@ static bool caller_may_see_dir(pid_t pid, const char *contrl, const char *cg)
 	}
 
 out:
+	if (!answer)
+		fprintf(stderr, "contrl: %s, cg: %s, task_cg: %s\n", contrl, cg, task_cg);
 	free(c2);
 	return answer;
 }
